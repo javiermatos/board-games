@@ -53,12 +53,12 @@ class Color(object):
 
 class Symbol(object):
 
-    def __init__(self, character, color):
+    def __init__(self, character: str, color: str) -> None:
         self.character = character
         self.color = color
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.color + self.character + Color.END
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()

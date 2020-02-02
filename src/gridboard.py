@@ -1,9 +1,23 @@
+from typing import Any, Callable, Generator, List, Tuple
+
 from .symbol import Character
+
+
+class EmptyCell(object):
+
+    def __str__(self) -> str:
+        return ' '
+
+    def __repr__(self) -> str:
+        return ' '
+
+
+EMPTY_CELL = EmptyCell()
 
 
 class GridBoard(object):
 
-    def __init__(self, rows, columns=None, default_value=None):
+    def __init__(self, rows: int, columns: int = None, default_value: Any = EMPTY_CELL) -> None:
         if columns is None:
             columns = rows
 
@@ -15,71 +29,84 @@ class GridBoard(object):
             for r in range(rows)
         ]
 
-    # def get(self, r, c):
+    # def get(self, r: int, c: int) -> Any:
     #     return self.grid[r][c]
     #
-    # def set(self, r, c, value):
+    # def set(self, r: int, c: int, value: Any) -> None:
     #     self.grid[r][c] = value
 
-    def get_rows(self):
+    def get_rows(self) -> Generator[List[Any], None, None]:
         for row in self.grid:
             yield row
 
-    def get_columns(self):
+    def get_columns(self) -> Generator[List[Any], None, None]:
         for c in range(self.columns):
             column = []
             for r in range(self.rows):
                 column.append(self.grid[r][c])
             yield column
 
-    def get_backward_diagonals(self):
+    def get_backward_diagonals(self) -> Generator[List[Any], None, None]:
         b = [None] * (len(self.grid) - 1)
         grid = [b[i:] + r + b[:i] for i, r in enumerate(self.get_rows())]
-        return [[c for c in r if c is not None] for r in zip(*grid)]
+        yield from ([c for c in r if c is not None] for r in zip(*grid))
 
-    def get_forward_diagonals(self):
+    def get_forward_diagonals(self) -> Generator[List[Any], None, None]:
         b = [None] * (len(self.grid) - 1)
         grid = [b[:i] + r + b[i:] for i, r in enumerate(self.get_rows())]
-        return [[c for c in r if c is not None] for r in zip(*grid)]
+        yield from ([c for c in r if c is not None] for r in zip(*grid))
 
-    def get_diagonals(self):
-        return self.get_backward_diagonals() + self.get_forward_diagonals()
+    def get_diagonals(self) -> Generator[List[Any], None, None]:
+        yield from self.get_backward_diagonals()
+        yield from self.get_forward_diagonals()
 
-    def is_empty(self):
+    def is_empty(self) -> bool:
         for row in self.grid:
             for cell in row:
                 if cell != self.default_value:
                     return False
         return True
 
-    def is_full(self):
+    def is_full(self) -> bool:
         for row in self.grid:
             for cell in row:
                 if cell == self.default_value:
                     return False
         return True
 
-    def __getitem__(self, key):
+    def get_filter_rows_columns(self, f: Callable) -> Generator[Tuple[int, int], None, None]:
+        for r in range(self.rows):
+            for c in range(self.columns):
+                if f(self.grid[r][c]):
+                    yield r, c
+
+    def get_empty_rows_columns(self) -> Generator[Tuple[int, int], None, None]:
+        yield from self.get_filter_rows_columns(lambda cell: cell == self.default_value)
+
+    def get_non_empty_rows_columns(self) -> Generator[Tuple[int, int], None, None]:
+        yield from self.get_filter_rows_columns(lambda cell: cell != self.default_value)
+
+    def __getitem__(self, key: Tuple[int, int]) -> Any:
         r, c = key
         return self.grid[r][c]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: Tuple[int, int], value: Any) -> None:
         r, c = key
         self.grid[r][c] = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         newline = '\n'
         space = ' '
         empty = ''
         return newline.join([
-            empty.join([str(c) if c is not self.default_value else space for c in r])
+            empty.join([str(c) for c in r])
             for r in self.grid
         ])
 
 
 class GridBoardPretty(GridBoard):
 
-    def __str__(self):
+    def __str__(self) -> str:
         edge_tl = Character.BOX_DRAWINGS_HEAVY_DOWN_AND_RIGHT
         edge_tr = Character.BOX_DRAWINGS_HEAVY_DOWN_AND_LEFT
         edge_bl = Character.BOX_DRAWINGS_HEAVY_UP_AND_RIGHT
@@ -99,7 +126,7 @@ class GridBoardPretty(GridBoard):
         row_mid = space + mid_l + lin_h + ((mid_c + lin_h) * (self.columns - 1)) + mid_r + newline
         row_bot = space + edge_bl + lin_h + ((mid_b + lin_h) * (self.columns - 1)) + edge_br
         rows = [
-            str(i) + lin_v + lin_v.join([str(c) if c is not None else space for c in r]) + lin_v + newline
+            str(i) + lin_v + lin_v.join([str(c) for c in r]) + lin_v + newline
             for i, r in enumerate(self.grid)
         ]
         return row_head + row_top + row_mid.join(rows) + row_bot

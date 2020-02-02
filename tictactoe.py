@@ -1,3 +1,4 @@
+import random
 from typing import Optional, Tuple
 
 from src.gridboard import GridBoard, GridBoardPretty
@@ -9,8 +10,14 @@ board = GridBoardPretty(3)
 
 class Player(object):
 
-    def __init__(self, symbol: Symbol):
+    def __init__(self, symbol: Symbol) -> None:
         self.symbol = symbol
+
+    def next(self, board: GridBoard) -> Tuple[int, int]:
+        raise NotImplementedError()
+
+
+class PlayerHuman(Player):
 
     def next(self, board: GridBoard) -> Tuple[int, int]:
         r, c = map(int, input('Row and column: ').split())
@@ -20,9 +27,16 @@ class Player(object):
         return r, c
 
 
+class PlayerComputerRandom(Player):
+
+    def next(self, board: GridBoard) -> Tuple[int, int]:
+        (r, c), = random.choices(list(board.get_empty_rows_columns()))
+        return r, c
+
+
 players = (
-    Player(Symbol('X', Color.RED)),
-    Player(Symbol('O', Color.GREEN)),
+    PlayerHuman(Symbol('X', Color.RED)),
+    PlayerComputerRandom(Symbol('O', Color.GREEN)),
 )
 
 

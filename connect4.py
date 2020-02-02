@@ -1,4 +1,5 @@
-from typing import Optional, Tuple
+import random
+from typing import Any, List, Optional, Tuple
 
 from src.gridboard import GridBoard, GridBoardPretty
 from src.symbol import Symbol, Color
@@ -10,8 +11,14 @@ winner_length = 4
 
 class Player(object):
 
-    def __init__(self, symbol: Symbol):
+    def __init__(self, symbol: Symbol) -> None:
         self.symbol = symbol
+
+    def next(self, board: GridBoard) -> int:
+        raise NotImplementedError()
+
+
+class PlayerHuman(Player):
 
     def next(self, board: GridBoard) -> int:
         c = int(input('Column: '))
@@ -21,9 +28,17 @@ class Player(object):
         return c
 
 
+class PlayerComputerRandom(Player):
+
+    def next(self, board: GridBoard) -> int:
+        row = next(board.get_rows())
+        c, = random.choices([c for c in range(len(row)) if row[c] == board.default_value])
+        return c
+
+
 players = (
-    Player(Symbol('X', Color.RED)),
-    Player(Symbol('O', Color.GREEN)),
+    PlayerHuman(Symbol('X', Color.RED)),
+    PlayerComputerRandom(Symbol('O', Color.GREEN)),
 )
 
 
@@ -31,27 +46,24 @@ def game_is_over(board: GridBoard) -> bool:
     return board.is_full()
 
 
-def get_symbol_max_length(board: GridBoard, l) -> Tuple[Optional[Symbol], int]:
+def get_symbol_max_length(board: GridBoard, line: List[Any]) -> Tuple[Optional[Symbol], int]:
     current_symbol = None
     current_length = 0
     max_symbol = current_symbol
     max_length = current_length
 
-    for cell in l:
+    for cell in line:
         if cell is board.default_value:
-            if current_symbol is not None and current_length > max_length:
-                max_symbol = current_symbol
-                max_length = current_length
             current_symbol = None
             current_length = 0
         elif cell == current_symbol:
             current_length += 1
         elif cell != current_symbol:
-            if current_symbol is not None and current_length > max_length:
-                max_symbol = current_symbol
-                max_length = current_length
             current_symbol = cell
             current_length = 1
+        if current_length > max_length:
+            max_symbol = current_symbol
+            max_length = current_length
 
     return max_symbol, max_length
 
