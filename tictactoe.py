@@ -1,16 +1,36 @@
+from typing import Optional, Tuple
+
 from src.gridboard import GridBoard, GridBoardPretty
 from src.symbol import Symbol, Color
 
 
 board = GridBoardPretty(3)
 
-symbols = (
-    Symbol('X', Color.RED),
-    Symbol('O', Color.GREEN),
+
+class Player(object):
+
+    def __init__(self, symbol: Symbol):
+        self.symbol = symbol
+
+    def next(self, board: GridBoard) -> Tuple[int, int]:
+        r, c = map(int, input('Row and column: ').split())
+        while not (0 <= r < board.rows) or not (0 <= c < board.columns) or board[r, c] is not board.default_value:
+            print('You have to choose a valid position')
+            r, c = map(int, input('Row and column: ').split())
+        return r, c
+
+
+players = (
+    Player(Symbol('X', Color.RED)),
+    Player(Symbol('O', Color.GREEN)),
 )
 
 
-def get_winner(board: GridBoard):
+def game_is_over(board: GridBoard) -> bool:
+    return board.is_full()
+
+
+def get_winner(board: GridBoard) -> Optional[Symbol]:
     for row in board.get_rows():
         if any(row) and all([row[0] == cell for cell in row]):
             return row[0]
@@ -23,24 +43,17 @@ def get_winner(board: GridBoard):
     return None
 
 
-def game_is_over(board: GridBoard):
-    return board.is_full()
-
-
 step = 0
 winner_symbol = None
 while not game_is_over(board):
     print(board)
 
-    # Get symbol for player
-    symbol = symbols[step % len(symbols)]
+    # Get player
+    player = players[step % len(players)]
 
     # Action
-    r, c = map(int, input('Row and column: ').split())
-    while not (0 <= r < board.rows) or not (0 <= c < board.columns) or board[r, c] is not board.default_value:
-        print('You have to choose a valid position')
-        r, c = map(int, input('Row and column: ').split())
-    board[r, c] = symbol
+    r, c = player.next(board)
+    board[r, c] = player.symbol
 
     step += 1
     winner_symbol = get_winner(board)

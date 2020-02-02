@@ -1,3 +1,5 @@
+from typing import Optional, Tuple
+
 from src.gridboard import GridBoard, GridBoardPretty
 from src.symbol import Symbol, Color
 
@@ -5,13 +7,31 @@ from src.symbol import Symbol, Color
 board = GridBoardPretty(6, 7)
 winner_length = 4
 
-symbols = (
-    Symbol('X', Color.RED),
-    Symbol('O', Color.GREEN),
+
+class Player(object):
+
+    def __init__(self, symbol: Symbol):
+        self.symbol = symbol
+
+    def next(self, board: GridBoard) -> int:
+        c = int(input('Column: '))
+        while not (0 <= c < board.columns) or board[0, c] is not board.default_value:
+            print('You have to choose a valid position')
+            c = int(input('Column: '))
+        return c
+
+
+players = (
+    Player(Symbol('X', Color.RED)),
+    Player(Symbol('O', Color.GREEN)),
 )
 
 
-def get_symbol_max_length(board: GridBoard, l):
+def game_is_over(board: GridBoard) -> bool:
+    return board.is_full()
+
+
+def get_symbol_max_length(board: GridBoard, l) -> Tuple[Optional[Symbol], int]:
     current_symbol = None
     current_length = 0
     max_symbol = current_symbol
@@ -36,7 +56,7 @@ def get_symbol_max_length(board: GridBoard, l):
     return max_symbol, max_length
 
 
-def get_winner(board: GridBoard):
+def get_winner(board: GridBoard) -> Optional[Symbol]:
     for row in board.get_rows():
         symbol, length = get_symbol_max_length(board, row)
         if length >= winner_length:
@@ -52,25 +72,18 @@ def get_winner(board: GridBoard):
     return None
 
 
-def game_is_over(board: GridBoard):
-    return board.is_full()
-
-
 step = 0
 winner_symbol = None
 while not game_is_over(board):
     print(board)
 
-    # Get symbol for player
-    symbol = symbols[step % len(symbols)]
+    # Get player
+    player = players[step % len(players)]
 
     # Action
-    c = int(input('Column: '))
-    while not (0 <= c < board.columns) or board[0, c] is not board.default_value:
-        print('You have to choose a valid position')
-        c = int(input('Column: '))
+    c = player.next(board)
     r = max([r for r in range(board.rows) if board[r, c] == board.default_value])
-    board[r, c] = symbol
+    board[r, c] = player.symbol
 
     step += 1
     winner_symbol = get_winner(board)
