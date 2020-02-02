@@ -77,7 +77,7 @@ class GridBoard(object):
         ])
 
 
-class GridBoardWithBorder(GridBoard):
+class GridBoardPretty(GridBoard):
 
     def __str__(self):
         edge_tl = Character.BOX_DRAWINGS_HEAVY_DOWN_AND_RIGHT
@@ -94,11 +94,12 @@ class GridBoardWithBorder(GridBoard):
         newline = '\n'
         space = ' '
 
-        row_top = edge_tl + lin_h + ((mid_t + lin_h) * (self.columns - 1)) + edge_tr + newline
-        row_mid = mid_l + lin_h + ((mid_c + lin_h) * (self.columns - 1)) + mid_r + newline
-        row_bot = edge_bl + lin_h + ((mid_b + lin_h) * (self.columns - 1)) + edge_br
+        row_head = space + ''.join([space + str(i) for i in range(self.columns)]) + space + newline
+        row_top = space + edge_tl + lin_h + ((mid_t + lin_h) * (self.columns - 1)) + edge_tr + newline
+        row_mid = space + mid_l + lin_h + ((mid_c + lin_h) * (self.columns - 1)) + mid_r + newline
+        row_bot = space + edge_bl + lin_h + ((mid_b + lin_h) * (self.columns - 1)) + edge_br
         rows = [
-            lin_v + lin_v.join([str(c) if c is not None else space for c in r]) + lin_v + newline
-            for r in self.grid
+            str(i) + lin_v + lin_v.join([str(c) if c is not None else space for c in r]) + lin_v + newline
+            for i, r in enumerate(self.grid)
         ]
-        return row_top + row_mid.join(rows) + row_bot
+        return row_head + row_top + row_mid.join(rows) + row_bot

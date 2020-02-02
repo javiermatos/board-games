@@ -1,8 +1,8 @@
-from src.gridboard import GridBoard, GridBoardWithBorder
+from src.gridboard import GridBoard, GridBoardPretty
 from src.symbol import Symbol, Color
 
 
-board = GridBoardWithBorder(3)
+board = GridBoardPretty(3)
 
 symbols = (
     Symbol('X', Color.RED),
@@ -36,12 +36,10 @@ while not game_is_over(board):
     symbol = symbols[step % len(symbols)]
 
     # Action
-    r = int(input('Row: '))
-    c = int(input('Column: '))
+    r, c = map(int, input('Row and column: ').split())
     while not (0 <= r < board.rows) or not (0 <= c < board.columns) or board[r, c] is not board.default_value:
         print('You have to choose a valid position')
-        r = int(input('Row: '))
-        c = int(input('Column: '))
+        r, c = map(int, input('Row and column: ').split())
     board[r, c] = symbol
 
     step += 1

@@ -1,8 +1,8 @@
-from src.gridboard import GridBoard, GridBoardWithBorder
+from src.gridboard import GridBoard, GridBoardPretty
 from src.symbol import Symbol, Color
 
 
-board = GridBoardWithBorder(6, 7)
+board = GridBoardPretty(6, 7)
 winner_length = 4
 
 symbols = (
