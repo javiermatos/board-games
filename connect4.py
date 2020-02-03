@@ -86,8 +86,8 @@ def get_winner(board: GridBoard) -> Optional[Symbol]:
 
 step = 0
 winner_symbol = None
+print(board)
 while not game_is_over(board):
-    print(board)
 
     # Get player
     player = players[step % len(players)]
@@ -97,14 +97,13 @@ while not game_is_over(board):
     r = max([r for r in range(board.rows) if board[r, c] == board.default_value])
     board[r, c] = player.symbol
 
+    print(board)
+
     step += 1
     winner_symbol = get_winner(board)
     if winner_symbol is not None:
-        print(board)
+        print('Ha ganado el jugador que utiliza la ficha {}.'.format(winner_symbol))
         break
 
-
-if winner_symbol is not None:
-    print('Ha ganado el jugador que utiliza la ficha {}.'.format(winner_symbol))
 else:
     print('Ha habido empate.')

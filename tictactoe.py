@@ -46,21 +46,21 @@ def game_is_over(board: GridBoard) -> bool:
 
 def get_winner(board: GridBoard) -> Optional[Symbol]:
     for row in board.get_rows():
-        if any(row) and all([row[0] == cell for cell in row]):
+        if all([(cell != board.default_value and cell == row[0]) for cell in row]):
             return row[0]
     for column in board.get_columns():
-        if any(column) and all([column[0] == cell for cell in column]):
+        if all([(cell != board.default_value and cell == column[0]) for cell in column]):
             return column[0]
     for diagonal in [d for d in board.get_diagonals() if len(d) == board.rows]:
-        if any(diagonal) and all([diagonal[0] == cell for cell in diagonal]):
+        if all([(cell != board.default_value and cell == diagonal[0]) for cell in diagonal]):
             return diagonal[0]
     return None
 
 
 step = 0
 winner_symbol = None
+print(board)
 while not game_is_over(board):
-    print(board)
 
     # Get player
     player = players[step % len(players)]
@@ -69,14 +69,13 @@ while not game_is_over(board):
     r, c = player.next(board)
     board[r, c] = player.symbol
 
+    print(board)
+
     step += 1
     winner_symbol = get_winner(board)
     if winner_symbol is not None:
-        print(board)
+        print('Ha ganado el jugador que utiliza la ficha {}.'.format(winner_symbol))
         break
 
-
-if winner_symbol is not None:
-    print('Ha ganado el jugador que utiliza la ficha {}.'.format(winner_symbol))
 else:
     print('Ha habido empate.')
