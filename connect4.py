@@ -22,7 +22,7 @@ class PlayerHuman(Player):
 
     def next(self, board: GridBoard) -> int:
         c = int(input('Column: '))
-        while not (0 <= c < board.columns) or board[0, c] is not board.default_value:
+        while not (0 <= c < board.columns) or (board[0, c] != board.default_value):
             print('You have to choose a valid position')
             c = int(input('Column: '))
         return c
@@ -53,7 +53,7 @@ def get_symbol_max_length(board: GridBoard, line: List[Any]) -> Tuple[Optional[S
     max_length = current_length
 
     for cell in line:
-        if cell is board.default_value:
+        if cell == board.default_value:
             current_symbol = None
             current_length = 0
         elif cell == current_symbol:

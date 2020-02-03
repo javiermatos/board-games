@@ -21,7 +21,7 @@ class PlayerHuman(Player):
 
     def next(self, board: GridBoard) -> Tuple[int, int]:
         r, c = map(int, input('Row and column: ').split())
-        while not (0 <= r < board.rows) or not (0 <= c < board.columns) or board[r, c] is not board.default_value:
+        while not (0 <= r < board.rows) or not (0 <= c < board.columns) or (board[r, c] != board.default_value):
             print('You have to choose a valid position')
             r, c = map(int, input('Row and column: ').split())
         return r, c
